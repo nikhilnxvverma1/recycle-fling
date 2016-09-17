@@ -24,8 +24,8 @@ public class GameplayController : MonoBehaviour {
 		UpdateTimeAndHealth();
 		Vector2 swipeDirection=processMouseInput();
 		if(swipeDirection!=Vector2.zero && !ignoreCurrentFling){
-			Debug.Log("applying force");
-//			Debug.Log("Swiped at "+swipeDirection.x+","+swipeDirection.y);
+//			Debug.Log("applying force");
+			Debug.Log("Swiped at "+swipeDirection.x+","+swipeDirection.y);
 			applyForceToCurrentItem(swipeDirection);
 		}
 
@@ -48,9 +48,18 @@ public class GameplayController : MonoBehaviour {
 	}
 
 	private void applyForceToCurrentItem(Vector2 direction){
-		Rigidbody2D rigidBody=currentTrashItem.GetComponent<Rigidbody2D>();
-		rigidBody.AddForce(direction.normalized*100);
-		rigidBody.gravityScale=1;
+
+		if(direction.y<0){
+			Rigidbody2D rigidBody=currentTrashItem.GetComponent<Rigidbody2D>();
+			rigidBody.AddForce(direction.normalized*100);
+			rigidBody.gravityScale=1;
+		}else{
+			//if the user swipes up , just drop the trash vertically down
+			Vector2 verticallyDown=new Vector2(0,-1);
+			Rigidbody2D rigidBody=currentTrashItem.GetComponent<Rigidbody2D>();
+			rigidBody.AddForce(verticallyDown.normalized*50);
+			rigidBody.gravityScale=1;
+		}
 
 	}
 
