@@ -16,7 +16,6 @@ public class UpdateTimer : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		Debug.Log(gameController.time);
-                timerText.text = gameController.time.ToString();
+                timerText.text = System.String.Format("{0:0}", gameController.time);
 	}
 }
