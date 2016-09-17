@@ -27,7 +27,7 @@ public class MatchBarToHealth : MonoBehaviour {
 		if(gameController!=null){
 			float health=gameController.health;
 			float width=worldWidth*(health/100);
-			Debug.Log("width is "+width);
+//			Debug.Log("width is "+width);
 			meshFilter.mesh=GetBarMeshrOfWidth(width);
 		}
 	}
@@ -42,7 +42,6 @@ public class MatchBarToHealth : MonoBehaviour {
 			new Vector3(width,BAR_HEIGHT,0),		
 		};
 		Vector3 lastV=mesh.vertices[3];
-		Debug.Log("last "+lastV.ToString());
 		mesh.uv=new Vector2[]{
 			new Vector2(0,0),
 			new Vector2(0,0),
