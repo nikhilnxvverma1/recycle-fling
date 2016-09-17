@@ -12,7 +12,9 @@ public class GameplayController : MonoBehaviour {
 	private Vector2 initialTouchPoint;
 	private const float MIN_SWIPE_DISTANCE=0.5f;
 	private bool ignoreCurrentFling=false;
-
+	private float t;
+	private Vector2 startPosition;
+	private Vector2 endPosition;
 
 	// Use this for initialization
 	void Start () {
@@ -26,14 +28,27 @@ public class GameplayController : MonoBehaviour {
 		if(swipeDirection!=Vector2.zero && !ignoreCurrentFling){
 //			Debug.Log("applying force");
 			Debug.Log("Swiped at "+swipeDirection.x+","+swipeDirection.y);
-			applyForceToCurrentItem(swipeDirection);
+//			applyForceToCurrentItem(swipeDirection);
+
 		}
 
 		//only needed for first iteration
 		if(currentTrashItem==null){
-			currentTrashItem=Instantiate(trashItems[0],new Vector3(0.02f,4.37f,0),Quaternion.identity) as GameObject;
-			currentTrashItem.GetComponent<Rigidbody2D>().gravityScale=0.1f;
+			startPosition=new Vector3(0.02f,4.37f,0);
+			Vector3 endPosition3=Camera.main.ViewportToWorldPoint(new Vector3(0.5f,0.5f));
+			endPosition=new Vector2(endPosition3.x,endPosition3.y);
+			t=0;
+			currentTrashItem=Instantiate(trashItems[0],startPosition,Quaternion.identity) as GameObject;
+//			currentTrashItem.GetComponent<Rigidbody2D>().gravityScale=0.1f;
 		}
+
+		//update the movement of the current trash item 
+		if(t<=1){
+			Vector2 currentPosition=Vector2.Lerp(startPosition,endPosition,t);
+			currentTrashItem.transform.position=currentPosition;
+			t+=Time.deltaTime;
+		}
+
 	}
 
 	private void UpdateTimeAndHealth(){
@@ -45,6 +60,12 @@ public class GameplayController : MonoBehaviour {
 			lastCheckpoint=time;
 			healthDecaySpeed+=0.1f;
 		}
+	}
+
+	private void sendToTrashBasedOnDirection(Vector2 direction){
+		startPosition=currentTrashItem.transform.position;
+		t=0;
+
 	}
 
 	private void applyForceToCurrentItem(Vector2 direction){
@@ -118,7 +139,7 @@ public class GameplayController : MonoBehaviour {
 		Destroy(currentTrashItem);
 		int randomIndex=Random.Range (0,trashItems.Length);
 		currentTrashItem=Instantiate(trashItems[randomIndex],new Vector3(0.02f,4.37f,0),Quaternion.identity) as GameObject;
-		currentTrashItem.GetComponent<Rigidbody2D>().gravityScale=0.1f;
+//		currentTrashItem.GetComponent<Rigidbody2D>().gravityScale=0.1f;
 		ignoreCurrentFling=true;
 	}
 }
