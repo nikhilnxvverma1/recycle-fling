@@ -5,7 +5,7 @@ public class GameplayController : MonoBehaviour {
 	public float time=0f;
 	public float health=100f;
 	public GameObject [] trashItems;
-	private float healthDecaySpeed=0.1f;
+	private float healthDecaySpeed=0.4f;
 	private float lastCheckpoint;
 	private GameObject currentTrashItem;
 	private Vector2 initialTouchPoint;
@@ -32,7 +32,7 @@ public class GameplayController : MonoBehaviour {
 		
 		//only needed for first iteration
 		if(currentTrashItem==null){
-			currentTrashItem=Instantiate(trashItems[0],new Vector3(0.02f,4.37f,0),Quaternion.identity) as GameObject;
+			currentTrashItem=Instantiate(trashItems[0],new Vector3(0.02f,5.37f,0),Quaternion.identity) as GameObject;
 			currentTrashItem.GetComponent<Rigidbody2D>().gravityScale=0.1f;
 		}
 	}
@@ -77,6 +77,7 @@ public class GameplayController : MonoBehaviour {
 		}
 		Vector2 moveDirection=finalPosition-currentTrashItem.transform.position;
 		currentTrashItem.GetComponent<Rigidbody2D>().AddForce(moveDirection.normalized*100);
+		currentTrashItem.GetComponent<TrashItem>().StartShrinkinig();
 //		if(direction.y<0){
 //			Rigidbody2D rigidBody=currentTrashItem.GetComponent<Rigidbody2D>();
 //			rigidBody.AddForce(direction.normalized*100);
@@ -145,7 +146,7 @@ public class GameplayController : MonoBehaviour {
 		//destroy the current trash and instantiate a new random one
 		Destroy(currentTrashItem);
 		int randomIndex=Random.Range (0,trashItems.Length);
-		currentTrashItem=Instantiate(trashItems[randomIndex],new Vector3(0.02f,4.37f,0),Quaternion.identity) as GameObject;
+		currentTrashItem=Instantiate(trashItems[randomIndex],new Vector3(0.02f,5.37f,0),Quaternion.identity) as GameObject;
 		currentTrashItem.GetComponent<Rigidbody2D>().gravityScale=0.1f;
 		ignoreCurrentFling=true;
 	}
