@@ -23,11 +23,12 @@ public class GameplayController : MonoBehaviour {
 		Vector2 swipeDirection=processMouseInput();
 		if(swipeDirection!=Vector2.zero){
 			Debug.Log("Swiped at "+swipeDirection.x+","+swipeDirection.y);
+			applyForceToCurrentItem(swipeDirection);
 		}
 		if(currentTrashItem==null){
 			currentTrashItem=Instantiate(trashItems[0],new Vector3(0.02f,4.37f,0),Quaternion.identity) as GameObject;
+			currentTrashItem.GetComponent<Rigidbody2D>().gravityScale=0.1f;
 		}
-
 	}
 
 	private void UpdateTimeAndHealth(){
@@ -39,6 +40,13 @@ public class GameplayController : MonoBehaviour {
 			lastCheckpoint=time;
 			healthDecaySpeed+=0.1f;
 		}
+	}
+
+	private void applyForceToCurrentItem(Vector2 direction){
+		Rigidbody2D rigidBody=currentTrashItem.GetComponent<Rigidbody2D>();
+		rigidBody.AddForce(direction.normalized*100);
+		rigidBody.gravityScale=1;
+
 	}
 
 	private Vector2 processMouseInput(){
