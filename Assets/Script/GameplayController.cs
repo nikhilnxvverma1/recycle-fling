@@ -11,6 +11,8 @@ public class GameplayController : MonoBehaviour {
 	private GameObject currentTrashItem;
 	private Vector2 initialTouchPoint;
 	private const float MIN_SWIPE_DISTANCE=0.5f;
+	private bool ignoreCurrentFling=false;
+
 
 	// Use this for initialization
 	void Start () {
@@ -21,10 +23,13 @@ public class GameplayController : MonoBehaviour {
 	void Update () {
 		UpdateTimeAndHealth();
 		Vector2 swipeDirection=processMouseInput();
-		if(swipeDirection!=Vector2.zero){
-			Debug.Log("Swiped at "+swipeDirection.x+","+swipeDirection.y);
+		if(swipeDirection!=Vector2.zero && !ignoreCurrentFling){
+			Debug.Log("applying force");
+//			Debug.Log("Swiped at "+swipeDirection.x+","+swipeDirection.y);
 			applyForceToCurrentItem(swipeDirection);
 		}
+
+		//only needed for first iteration
 		if(currentTrashItem==null){
 			currentTrashItem=Instantiate(trashItems[0],new Vector3(0.02f,4.37f,0),Quaternion.identity) as GameObject;
 			currentTrashItem.GetComponent<Rigidbody2D>().gravityScale=0.1f;
@@ -65,6 +70,7 @@ public class GameplayController : MonoBehaviour {
 
 		}else{
 			//release
+			ignoreCurrentFling=false;
 		}
 			
 //			foreach(Touch touch in Input.touches){
@@ -89,7 +95,21 @@ public class GameplayController : MonoBehaviour {
 		return Vector2.zero;
 	}
 
-	void OnMouseDown(){
-		Debug.Log("Mouse down");
+	public void CorrectAnswer(bool correct){
+		if(correct){
+			Debug.Log("Correct answer");
+			health=health+5>100?100:health+5;
+
+		}else{
+			Debug.Log("Wrong answer");
+			health=health-5<0?100:health-5;
+		}
+
+		//destroy the current trash and instantiate a new random one
+		Destroy(currentTrashItem);
+		int randomIndex=Random.Range (0,trashItems.Length);
+		currentTrashItem=Instantiate(trashItems[randomIndex],new Vector3(0.02f,4.37f,0),Quaternion.identity) as GameObject;
+		currentTrashItem.GetComponent<Rigidbody2D>().gravityScale=0.1f;
+		ignoreCurrentFling=true;
 	}
 }
