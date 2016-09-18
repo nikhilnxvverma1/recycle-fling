@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class GameplayController : MonoBehaviour {
 	public float time=0f;
@@ -14,22 +15,34 @@ public class GameplayController : MonoBehaviour {
 	public GameObject recycleBin;
 	public GameObject landfillBin;
 	public GameObject compostBin;
+	private float lastSpawnTime=0;
+	private float spawnGap=5;
+//	private ArrayList<GameObject> currentTrashItems=new GameObject[50];
+//	private int currentTrashItemsLength;
 	
 	// Use this for initialization
 	void Start () {
 		lastCheckpoint=time;
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		
+
 		UpdateTimeAndHealth();
 		Vector2 swipeDirection=processMouseInput();
 		if(swipeDirection!=Vector2.zero && !ignoreCurrentFling){
-			//			Debug.Log("applying force");
-//			Debug.Log("Swiped at "+swipeDirection.x+","+swipeDirection.y);
 			applyForceToFallingItems(swipeDirection);
 		}
-		
+
+//		if(time-lastSpawnTime>spawnGap){
+//			lastSpawnTime=time;
+//			//TODO spawn new item
+//			GameObject trash=CreateNewTrash();
+//			currentTrashItems[currentTrashItemsLength++]=trash;
+//		}
+
 		//only needed for first iteration
 		if(currentTrashItem==null){
 			currentTrashItem=Instantiate(trashItems[0],new Vector3(0.02f,5.37f,0),Quaternion.identity) as GameObject;
@@ -45,6 +58,12 @@ public class GameplayController : MonoBehaviour {
 		if(time-lastCheckpoint>10){
 			lastCheckpoint=time;
 			healthDecaySpeed+=0.1f;
+			spawnGap-=0.2f;//not used
+		}
+
+		if(health<0){
+			Debug.Log("Loading game over scene");
+			SceneManager.LoadScene(3,LoadSceneMode.Single);
 		}
 	}
 	
@@ -76,7 +95,7 @@ public class GameplayController : MonoBehaviour {
 			}
 		}
 		Vector2 moveDirection=finalPosition-currentTrashItem.transform.position;
-		currentTrashItem.GetComponent<Rigidbody2D>().AddForce(moveDirection.normalized*100);
+		currentTrashItem.GetComponent<Rigidbody2D>().AddForce(moveDirection.normalized*300);
 		currentTrashItem.GetComponent<TrashItem>().StartShrinkinig();
 //		if(direction.y<0){
 //			Rigidbody2D rigidBody=currentTrashItem.GetComponent<Rigidbody2D>();
@@ -136,14 +155,17 @@ public class GameplayController : MonoBehaviour {
 	public void CorrectAnswer(GameObject from){
 		
 		Debug.Log("Correct answer");
-		health=health+5>100?100:health+5;			
+		health=health+20>100?100:health+20;			
 		DestroyOldAndCreateNewOne(from);
 	}
 
 	public void WrongAnswer(GameObject from){
 
 		Debug.Log("Wrong answer");
-		health=health-5<0?100:health-5;
+		health-=20;
+		if(health<0){
+			SceneManager.LoadScene(3,LoadSceneMode.Single);
+		}
 		DestroyOldAndCreateNewOne(from);
 	}
 
@@ -155,4 +177,13 @@ public class GameplayController : MonoBehaviour {
 		currentTrashItem.GetComponent<Rigidbody2D>().gravityScale=0.1f;
 		ignoreCurrentFling=true;
 	}
+
+	private GameObject CreateNewTrash(){
+		int randomIndex=Random.Range (0,trashItems.Length);
+		GameObject trash=Instantiate(trashItems[randomIndex],new Vector3(0.02f,5.37f,0),Quaternion.identity) as GameObject;
+		trash.GetComponent<Rigidbody2D>().gravityScale=0.1f;
+		return trash;
+	}
+
+
 }
