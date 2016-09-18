@@ -63,6 +63,7 @@ public class GameplayController : MonoBehaviour {
 
 		if(health<0){
 			Debug.Log("Loading game over scene");
+			ScoreUpdate.timeFromLastLevel=time;
 			SceneManager.LoadScene(3,LoadSceneMode.Single);
 		}
 	}
@@ -182,6 +183,7 @@ public class GameplayController : MonoBehaviour {
 		Debug.Log("Wrong answer");
 		health-=20;
 		if(health<0){
+			ScoreUpdate.timeFromLastLevel=time;
 			SceneManager.LoadScene(3,LoadSceneMode.Single);
 		}
 		DestroyOldAndCreateNewOne(from);
