@@ -97,6 +97,9 @@ public class GameplayController : MonoBehaviour {
 		Vector2 moveDirection=finalPosition-currentTrashItem.transform.position;
 		currentTrashItem.GetComponent<Rigidbody2D>().AddForce(moveDirection.normalized*300);
 		currentTrashItem.GetComponent<TrashItem>().StartShrinkinig();
+		Rigidbody2D rigidBody=currentTrashItem.GetComponent<Rigidbody2D>();
+		rigidBody.gravityScale=1;
+
 //		if(direction.y<0){
 //			Rigidbody2D rigidBody=currentTrashItem.GetComponent<Rigidbody2D>();
 //			rigidBody.AddForce(direction.normalized*100);
