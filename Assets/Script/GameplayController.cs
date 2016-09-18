@@ -71,46 +71,43 @@ public class GameplayController : MonoBehaviour {
 
 		Vector3 finalPosition;
 
-		if(Mathf.Abs(direction.x)>Mathf.Abs(direction.y)){
-			//more shift in along the x axis
-			if(direction.x<0){
-				//left
-				Debug.Log("Left");
-				finalPosition=recycleBin.transform.position;
-			}else{
-				//right
-				Debug.Log("Right");
-				finalPosition=landfillBin.transform.position;
-			}
-		}else{
-			//more shift along the vertical axis
-			if(direction.y<0){
-				//down
-				Debug.Log("Down");
-				finalPosition=compostBin.transform.position;
-			}else{
-				//up
-				Debug.Log("Up");
-				finalPosition=compostBin.transform.position;
-			}
-		}
-		Vector2 moveDirection=finalPosition-currentTrashItem.transform.position;
-		currentTrashItem.GetComponent<Rigidbody2D>().AddForce(moveDirection.normalized*300);
-		currentTrashItem.GetComponent<TrashItem>().StartShrinkinig();
-		Rigidbody2D rigidBody=currentTrashItem.GetComponent<Rigidbody2D>();
-		rigidBody.gravityScale=1;
-
-//		if(direction.y<0){
-//			Rigidbody2D rigidBody=currentTrashItem.GetComponent<Rigidbody2D>();
-//			rigidBody.AddForce(direction.normalized*100);
-//			rigidBody.gravityScale=1;
+//		if(Mathf.Abs(direction.x)>Mathf.Abs(direction.y)){
+//			//more shift in along the x axis
+//			if(direction.x<0){
+//				//left
+//				Debug.Log("Left");
+//				finalPosition=recycleBin.transform.position;
+//			}else{
+//				//right
+//				Debug.Log("Right");
+//				finalPosition=landfillBin.transform.position;
+//			}
 //		}else{
-//			//if the user swipes up , just drop the trash vertically down
-//			Vector2 verticallyDown=new Vector2(0,-1);
-//			Rigidbody2D rigidBody=currentTrashItem.GetComponent<Rigidbody2D>();
-//			rigidBody.AddForce(verticallyDown.normalized*50);
-//			rigidBody.gravityScale=1;
+//			//more shift along the vertical axis
+//			if(direction.y<0){
+//				//down
+//				Debug.Log("Down");
+//				finalPosition=compostBin.transform.position;
+//			}else{
+//				//up
+//				Debug.Log("Up");
+//				finalPosition=compostBin.transform.position;
+//			}
 //		}
+//
+		GameObject bin=CorrectBinForFling(direction);//Check inside a funnel
+		finalPosition=bin.transform.position;
+
+		//old way of doing applying force and hoping it will reach in time
+//		Vector2 moveDirection=finalPosition-currentTrashItem.transform.position;
+//		currentTrashItem.GetComponent<Rigidbody2D>().AddForce(moveDirection.normalized*300);
+//		currentTrashItem.GetComponent<TrashItem>().StartShrinkinig();
+//		Rigidbody2D rigidBody=currentTrashItem.GetComponent<Rigidbody2D>();
+//		rigidBody.gravityScale=1;
+
+		//new way involves manually calculating the position between two points in each update 
+		//over a given duration. This makes it independent of screen resolution
+		currentTrashItem.GetComponent<TrashItem>().MoveAndShrinkTo(finalPosition,0.3f);
 		
 	}
 	
@@ -132,29 +129,47 @@ public class GameplayController : MonoBehaviour {
 			//release
 			ignoreCurrentFling=false;
 		}
-		
-		//			foreach(Touch touch in Input.touches){
-		//				switch(touch.phase){
-		//					case TouchPhase.Began:
-		//						initialTouchPoint=touch.position;
-		//						break;
-		//					case TouchPhase.Moved:
-		//						Vector2 currentTouchPoint=touch.position;
-		//						float distance=Vector2.Distance(initialTouchPoint,currentTouchPoint);
-		//						if(distance>=MIN_SWIPE_DISTANCE){
-		//							return currentTouchPoint-initialTouchPoint;		
-		//						}
-		//						break;
-		//					case TouchPhase.Ended:
-		//						break;
-		//					case TouchPhase.Canceled:
-		//						break;
-		//				}
-		//			}
-		//		}
+
 		return Vector2.zero;
 	}
+
+	private GameObject CorrectBinForFling(Vector2 direction){
+		Vector2 finalPosition=initialTouchPoint+direction;
+		Vector3 fallingItemPosition=currentTrashItem.transform.position;
+
+		//calculate the funnel angle range for the middle bin
+		Vector3 middleBinPosition=compostBin.transform.position;
+
+		//get the bin dimensions in world space
 	
+//		RectTransform rectTransform=(RectTransform)compostBin.transform;
+		float binWidth=1.85f;
+		float binHeight=1.13f;
+		Debug.Log(" middle bin dimensions= "+binWidth+" "+binHeight);
+
+		Vector3 leftEdge=new Vector3(middleBinPosition.x,middleBinPosition.y,middleBinPosition.z);
+		leftEdge.x-=binWidth;
+
+		Vector3 rightEdge=new Vector3(middleBinPosition.x,middleBinPosition.y,middleBinPosition.z);
+		rightEdge.x+=binWidth;
+
+		Vector3 leftVector=leftEdge-fallingItemPosition;
+		Vector3 rightVector=rightEdge-fallingItemPosition;
+
+		//normalize vectors left,right and direction before comparing x values
+		leftVector.Normalize();
+		rightVector.Normalize();
+		direction.Normalize();
+
+		if(direction.x<leftVector.x){
+			return recycleBin;
+		}else if(direction.x>rightVector.x){
+			return landfillBin;
+		}else{
+			return compostBin;
+		}
+	}
+
 	public void CorrectAnswer(GameObject from){
 		
 		Debug.Log("Correct answer");

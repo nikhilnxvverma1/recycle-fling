@@ -3,8 +3,13 @@ using System.Collections;
 
 public class TrashItem : MonoBehaviour {
 
-	private const float targetScale=0.5f;
+	private const float targetScale=0.3f;
 	private bool shrink=false;
+	private bool shrinkAndMove=false;
+	private float shrinkAndMoveDuration;
+	private Vector2 initialPosition;
+	private Vector2 finalPosition;
+	private float timeSurpassed=0;
 
 	// Use this for initialization
 	void Start () {
@@ -19,9 +24,29 @@ public class TrashItem : MonoBehaviour {
 			}
 		}
 
+		if(shrinkAndMove){
+			timeSurpassed+=Time.deltaTime;
+			float fraction=timeSurpassed/shrinkAndMoveDuration;
+//			Debug.Log("Fraction "+fraction);
+
+			Vector2 interpolated=Vector2.Lerp(initialPosition,finalPosition,fraction);
+			transform.position=interpolated;
+
+			Vector3 scale=Vector3.Lerp(Vector3.one,new Vector3(targetScale,targetScale,targetScale),fraction);
+			transform.localScale=scale;
+		}
+
 	}
 
 	public void StartShrinkinig(){
 		shrink=true;
+	}
+
+	public void MoveAndShrinkTo(Vector2 position,float duration){
+		shrinkAndMove=true;
+		shrinkAndMoveDuration=duration;
+		initialPosition=transform.position;
+		finalPosition=position;
+		timeSurpassed=0;
 	}
 }
