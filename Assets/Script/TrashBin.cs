@@ -21,9 +21,9 @@ public class TrashBin : MonoBehaviour {
 		if ((coll.gameObject.tag == "Recylable" && category==0)
 			||(coll.gameObject.tag == "Compost" && category==1)
 			||(coll.gameObject.tag == "Compost" && category==2)){
-			gameController.SendMessage("CorrectAnswer", true);
+			gameController.SendMessage("CorrectAnswer", coll.gameObject);
 		}else{
-			gameController.SendMessage("CorrectAnswer", false);
+			gameController.SendMessage("WrongAnswer", coll.gameObject);
 		}
 	}
 }

@@ -133,18 +133,23 @@ public class GameplayController : MonoBehaviour {
 		return Vector2.zero;
 	}
 	
-	public void CorrectAnswer(bool correct){
-		if(correct){
-			Debug.Log("Correct answer");
-		health=health+5>100?100:health+5;
-			
-		}else{
-			Debug.Log("Wrong answer");
-		health=health-5<0?100:health-5;
-		}
+	public void CorrectAnswer(GameObject from){
 		
+		Debug.Log("Correct answer");
+		health=health+5>100?100:health+5;			
+		DestroyOldAndCreateNewOne(from);
+	}
+
+	public void WrongAnswer(GameObject from){
+
+		Debug.Log("Wrong answer");
+		health=health-5<0?100:health-5;
+		DestroyOldAndCreateNewOne(from);
+	}
+
+	private void DestroyOldAndCreateNewOne(GameObject toBeDestroyed){
 		//destroy the current trash and instantiate a new random one
-		Destroy(currentTrashItem);
+		Destroy(toBeDestroyed);
 		int randomIndex=Random.Range (0,trashItems.Length);
 		currentTrashItem=Instantiate(trashItems[randomIndex],new Vector3(0.02f,5.37f,0),Quaternion.identity) as GameObject;
 		currentTrashItem.GetComponent<Rigidbody2D>().gravityScale=0.1f;
