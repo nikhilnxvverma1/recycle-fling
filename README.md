@@ -3,4 +3,4 @@ Identifying everyday products that are recyclable can be a challenge. For exampl
 
 ![Recyle Rampage preview](http://res.cloudinary.com/madebynikhil/image/upload/v1474293508/recycle-rampage-preview_fotbqi.gif)
 
-Recycle Rampage won the [Best UI/Design in Big Red Hacks 2016](https://bigredhacks2016.hackerearth.com/sprints/bigredhacks-fall-2016/teams/515a200/submission/) held at Cornell University.
+Recycle Rampage won the [Best UI/Design in Big Red Hacks 2016](https://bigredhacks2016.hackerearth.com/sprints/bigredhacks-fall-2016/dashboard/Recycle_Rampage/submission/) held at Cornell University.
